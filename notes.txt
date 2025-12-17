@@ -1,0 +1,9 @@
+pwsh .\sqlrestore.ps1 \
+  -SourceHost 'mydb.abc123xyz.eu-west-1.rds.amazonaws.com' \
+  -SourceUser 'awsadmin' \
+  -SourcePassword (Read-Host -AsSecureString 'AWS password') \
+  -SourceDatabase 'myapp' \
+  -TargetHost 'myserver.mysql.database.azure.com' \
+  -TargetUser 'azureadmin' \
+  -TargetPassword (Read-Host -AsSecureString 'Azure password') \
+  -TargetDatabase 'myapp'
