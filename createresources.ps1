@@ -1,11 +1,11 @@
 # create variables for resource group name and location
-$resourceGroupName = "ecpl-websites-rg"
+
 $location = "southafricanorth"
 $staticwebSiteSku = "Standard"  
 $frontEndRepositoryUrl = "https://dev.azure.com/eclegislature/Website/_git/ecpl-frontend.git"
 $cmsRepositoryUrl = "https://dev.azure.com/eclegislature/Website/_git/ecpl-content-service.git"
 $environment = "qa"
-
+$resourceGroupName = "ecpl-websites-rg-$environment"
 
 # create a resource group using az cli
 az group create --name $resourceGroupName --location $location
