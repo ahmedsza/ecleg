@@ -22,6 +22,10 @@ $appServicePlanSKU="P1v3"  # Premium v3 for App Service Plan
 $workerCount=2
 $mysqlAdminUserName="ecpladminuser"
 $mysqlAdminPassword=""  # Replace with a secure password
+$mysqlSku="Standard_B1ms"
+$logAnalyticsWorkspaceName = "ecpl-loganalytics-$environment"
+$appInsightsName = "ecpl-appinsights-$environment"
+
 
 # create a resource group using az cli
 az group create --name $resourceGroupName --location $location
@@ -59,9 +63,16 @@ az keyvault create --name $keyVaultName --resource-group $resourceGroupName --lo
 Write-Output "Key Vault '$keyVaultName' created in resource group '$resourceGroupName'."
 
 # create a mysql flexible server and database
-az mysql flexible-server create --name $mysqlServerName --resource-group $resourceGroupName --location $location --admin-user $mysqlAdminUserName --admin-password $mySQLAdminPassword --sku-name Standard_B1ms --zone 1
+az mysql flexible-server create --name $mysqlServerName --resource-group $resourceGroupName --location $location --admin-user $mysqlAdminUserName --admin-password $mysqlAdminPassword --sku-name $mysqlSku --zone 1
 Write-Output "MySQL Flexible Server '$mysqlServerName' created in resource group '$resourceGroupName'."
 
 # create a mysql database
 az mysql flexible-server db create --name $mysqlDatabaseName --resource-group $resourceGroupName --server-name $mysqlServerName
 Write-Output "MySQL Database '$mysqlDatabaseName' created on server '$mysqlServerName'."
+
+# create a log analytics workspace with support for app insights
+az monitor log-analytics workspace create --resource-group $resourceGroupName --workspace-name $logAnalyticsWorkspaceName --location $location
+Write-Output "Log Analytics Workspace '$logAnalyticsWorkspaceName' created in resource group '$resourceGroupName'."
+# create an application insights resource
+az monitor app-insights component create --app $appInsightsName --location $location --resource -group $resourceGroupName --workspace $logAnalyticsWorkspaceName
+Write-Output "Application Insights '$appInsightsName' created in resource group '$resourceGroupName'."
