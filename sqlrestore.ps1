@@ -81,9 +81,6 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# Initialize cache for SSL support detection
-$script:__sslModeSupportCache = @{}
-
 function Get-MySqlSslArgs {
 	param(
 		[Parameter(Mandatory)][ValidateSet('mysql', 'mysqldump')][string] $Tool,
@@ -98,17 +95,23 @@ function Get-MySqlSslArgs {
 	# Some mysql/mysqldump clients (notably the one in Azure Cloud Shell) do not support --ssl-mode.
 	# When unsupported, passing --ssl-mode=REQUIRED is interpreted as a server variable assignment and fails with:
 	#   /usr/bin/mysql: unknown variable 'ssl-mode=REQUIRED'
-	if (-not $script:__sslModeSupportCache.ContainsKey($Tool)) {
+	# Use a local variable instead of script scope to avoid Cloud Shell scoping issues
+	if (-not (Get-Variable -Name '__sslModeSupportCacheLocal' -Scope Script -ErrorAction SilentlyContinue)) {
+		Set-Variable -Name '__sslModeSupportCacheLocal' -Value @{} -Scope Script
+	}
+	$cache = Get-Variable -Name '__sslModeSupportCacheLocal' -Scope Script -ValueOnly
+	
+	if (-not $cache.ContainsKey($Tool)) {
 		try {
 			$help = & $Tool '--help' 2>&1 | Out-String
-			$script:__sslModeSupportCache[$Tool] = ($help -match '(?m)^\s*--ssl-mode')
+			$cache[$Tool] = ($help -match '(?m)^\s*--ssl-mode')
 		}
 		catch {
-			$script:__sslModeSupportCache[$Tool] = $false
+			$cache[$Tool] = $false
 		}
 	}
 
-	if ($script:__sslModeSupportCache[$Tool]) {
+	if ($cache[$Tool]) {
 		return @("--ssl-mode=$SslMode")
 	}
 
