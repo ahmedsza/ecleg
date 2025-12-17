@@ -32,7 +32,7 @@ param(
 	[string] $SourceUser,
 
 	[Parameter(Mandatory)]
-	[SecureString] $SourcePassword,
+	[object] $SourcePassword,
 
 	[Parameter(Mandatory)]
 	[string] $SourceDatabase,
@@ -52,7 +52,7 @@ param(
 	[string] $TargetUser,
 
 	[Parameter(Mandatory)]
-	[SecureString] $TargetPassword,
+	[object] $TargetPassword,
 
 	[Parameter(Mandatory)]
 	[string] $TargetDatabase,
@@ -89,14 +89,20 @@ function Test-CommandExists {
 }
 
 function ConvertTo-PlainText {
-	param([Parameter(Mandatory)][SecureString] $Secure)
-	$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-	try {
-		return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+	param([Parameter(Mandatory)] $Secure)
+	if ($Secure -is [string]) {
+		return $Secure
 	}
-	finally {
-		[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+	if ($Secure -is [securestring]) {
+		$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
+		try {
+			return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+		}
+		finally {
+			[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+		}
 	}
+	throw "Password must be a SecureString or plain string. Got: $($Secure.GetType().FullName)"
 }
 
 function Invoke-MySqlQuery {
@@ -104,7 +110,7 @@ function Invoke-MySqlQuery {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)][SecureString] $Password,
+		[Parameter(Mandatory)] $Password,
 		[Parameter(Mandatory)][string] $Query,
 		[Parameter()][string] $Database,
 		[Parameter(Mandatory)][string] $SslMode
@@ -142,7 +148,7 @@ function Invoke-MySqlDump {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)][SecureString] $Password,
+		[Parameter(Mandatory)] $Password,
 		[Parameter(Mandatory)][string] $Database,
 		[Parameter(Mandatory)][string] $SslMode,
 		[Parameter(Mandatory)][string] $OutFile
@@ -184,7 +190,7 @@ function Invoke-MySqlRestore {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)][SecureString] $Password,
+		[Parameter(Mandatory)] $Password,
 		[Parameter(Mandatory)][string] $SslMode,
 		[Parameter(Mandatory)][string] $InFile
 	)
