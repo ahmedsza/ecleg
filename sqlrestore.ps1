@@ -204,10 +204,24 @@ function Invoke-MySqlDump {
 			'--databases', $Database,
 			'--single-transaction',
 			'--routines', '--events', '--triggers',
-			'--hex-blob',
-			'--set-gtid-purged=OFF',
-			'--column-statistics=0'
+			'--hex-blob'
 		)
+		
+		# Only add these flags if mysqldump supports them (newer versions)
+		# Cloud Shell has older mysqldump that doesn't recognize these
+		try {
+			$help = & mysqldump '--help' 2>&1 | Out-String
+			if ($help -match '--set-gtid-purged') {
+				$args += '--set-gtid-purged=OFF'
+			}
+			if ($help -match '--column-statistics') {
+				$args += '--column-statistics=0'
+			}
+		}
+		catch {
+			# Ignore help check errors
+		}
+		
 		$args = @($args | Where-Object { $_ -ne $null -and $_ -ne '' } | ForEach-Object { $_ })
 
 		$errFile = "$OutFile.stderr.txt"
