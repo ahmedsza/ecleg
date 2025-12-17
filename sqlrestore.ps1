@@ -128,7 +128,7 @@ function Invoke-MySqlQuery {
 
 		$out = & mysql @args 2>&1
 		if ($LASTEXITCODE -ne 0) {
-			throw "mysql query failed (exit $LASTEXITCODE) against $Host:$Port. Output:`n$out"
+			throw "mysql query failed (exit $LASTEXITCODE) against ${Host}:$Port. Output:`n$out"
 		}
 		return $out
 	}
