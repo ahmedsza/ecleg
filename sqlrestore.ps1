@@ -81,6 +81,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# Initialize cache for SSL support detection
+$script:__sslModeSupportCache = @{}
+
 function Get-MySqlSslArgs {
 	param(
 		[Parameter(Mandatory)][ValidateSet('mysql', 'mysqldump')][string] $Tool,
@@ -95,9 +98,6 @@ function Get-MySqlSslArgs {
 	# Some mysql/mysqldump clients (notably the one in Azure Cloud Shell) do not support --ssl-mode.
 	# When unsupported, passing --ssl-mode=REQUIRED is interpreted as a server variable assignment and fails with:
 	#   /usr/bin/mysql: unknown variable 'ssl-mode=REQUIRED'
-	if (-not $script:__sslModeSupportCache) {
-		$script:__sslModeSupportCache = @{}
-	}
 	if (-not $script:__sslModeSupportCache.ContainsKey($Tool)) {
 		try {
 			$help = & $Tool '--help' 2>&1 | Out-String
