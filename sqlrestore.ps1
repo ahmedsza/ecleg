@@ -95,7 +95,7 @@ function ConvertTo-PlainText {
 
 function Invoke-MySqlQuery {
 	param(
-		[Parameter(Mandatory)][string] $Host,
+		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
@@ -109,7 +109,7 @@ function Invoke-MySqlQuery {
 	$env:MYSQL_PWD = $plain
 	try {
 		$args = @(
-			'--host', $Host,
+			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
 			"--ssl-mode=$SslMode",
@@ -122,7 +122,7 @@ function Invoke-MySqlQuery {
 
 		$out = & mysql @args 2>&1
 		if ($LASTEXITCODE -ne 0) {
-			throw "mysql query failed (exit $LASTEXITCODE) against ${Host}:$Port. Output:`n$out"
+			throw "mysql query failed (exit $LASTEXITCODE) against ${MySqlHost}:$Port. Output:`n$out"
 		}
 		return $out
 	}
@@ -133,7 +133,7 @@ function Invoke-MySqlQuery {
 
 function Invoke-MySqlDump {
 	param(
-		[Parameter(Mandatory)][string] $Host,
+		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
@@ -147,7 +147,7 @@ function Invoke-MySqlDump {
 	$env:MYSQL_PWD = $plain
 	try {
 		$args = @(
-			'--host', $Host,
+			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
 			"--ssl-mode=$SslMode",
@@ -175,7 +175,7 @@ function Invoke-MySqlDump {
 
 function Invoke-MySqlRestore {
 	param(
-		[Parameter(Mandatory)][string] $Host,
+		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
@@ -188,7 +188,7 @@ function Invoke-MySqlRestore {
 	$env:MYSQL_PWD = $plain
 	try {
 		$args = @(
-			'--host', $Host,
+			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
 			"--ssl-mode=$SslMode"
