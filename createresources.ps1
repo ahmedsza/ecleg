@@ -39,13 +39,17 @@ Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$
 # create a storage account for all the documents using zone redundant storage
 
 
-az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku $storageSku --kind StorageV2
+az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku $storageSku 
 Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName'."
 
 # create an app service with zone redundancy 
-az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $appServicePlanSKU --is-linux
-Write-Output "App Service Plan '$appServicePlanName' created in resource group '$resourceGroupName'."
+az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $appServicePlanSKU --is-linux --zone-redundant
+Write-Output "App Service Plan '$appServicePlanName' created in resource group '$resourceGroupName' with zone redundancy enabled."
 
+# create an app service with support for expres/node
+
+az webapp create --name $appServiceName --resource-group $resourceGroupName --plan $appServicePlanName --runtime "NODE|20-lts"
+Write-Output "App Service '$appServiceName' created in resource group '$resourceGroupName'."
 
 
 # create a keyvault
