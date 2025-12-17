@@ -38,9 +38,8 @@ Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$
 
 # create a storage account for all the documents using zone redundant storage
 
-
-az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku $storageSku 
-Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName'."
+az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_ZRS --kind StorageV2
+Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName' with zone redundancy."
 
 # create an app service with zone redundancy 
 az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $appServicePlanSKU --is-linux --zone-redundant
