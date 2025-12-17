@@ -40,7 +40,9 @@ Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$
 az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku $storageSku --kind StorageV2
 Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName'."
 
-# create an app service
+# create an app service with zone redundant storage
+
+
 
 # create a keyvault
 
