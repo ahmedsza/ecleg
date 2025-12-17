@@ -242,7 +242,7 @@ New-Item -ItemType Directory -Path $WorkingDirectory -Force | Out-Null
 $dumpFile = Join-Path $WorkingDirectory ("{0}-{1:yyyyMMdd-HHmmss}.sql" -f $SourceDatabase, (Get-Date))
 
 Write-Output "[1/6] Reading source DB charset/collation from AWS..."
-$sourceSchemaLine = Invoke-MySqlQuery -Host $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query (
+$sourceSchemaLine = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query (
 	"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$SourceDatabase';"
 )
 if (-not $sourceSchemaLine) {
@@ -261,8 +261,8 @@ Write-Output "Source DB default charset='$sourceCharset', collation='$sourceColl
 
 Write-Output "[2/6] Reading key MySQL settings (source + target)..."
 $settingsQuery = "SELECT 'character_set_server', @@character_set_server UNION ALL SELECT 'collation_server', @@collation_server UNION ALL SELECT 'sql_mode', @@sql_mode UNION ALL SELECT 'time_zone', @@time_zone;"
-$sourceSettings = Invoke-MySqlQuery -Host $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query $settingsQuery
-$targetSettings = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $settingsQuery
+$sourceSettings = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query $settingsQuery
+$targetSettings = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $settingsQuery
 
 Write-Output "Source settings:"; Write-Output $sourceSettings
 Write-Output "Target settings:"; Write-Output $targetSettings
@@ -273,7 +273,7 @@ Write-Output "Settings comparison (key items):"
 Write-SettingsComparison -Source $sourceMap -Target $targetMap
 
 Write-Output "[3/6] Creating target DB in Azure with matching charset/collation..."
-$targetDbLine = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
+$targetDbLine = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
 	"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$TargetDatabase';"
 ) | Select-Object -First 1
 
@@ -286,23 +286,23 @@ if ($targetDbLine) {
 		Write-Output "Dropping existing target DB '$TargetDatabase'..."
 		$bt = [char]96
 		$dropSql = "DROP DATABASE IF EXISTS $bt$TargetDatabase$bt;"
-		$null = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $dropSql
+		$null = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $dropSql
 	}
 }
 
 # Create DB (or ensure it exists) with matching defaults
 $bt = [char]96
 $createDbSql = "CREATE DATABASE IF NOT EXISTS $bt$TargetDatabase$bt CHARACTER SET $sourceCharset COLLATE $sourceCollation;"
-$null = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $createDbSql
+$null = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $createDbSql
 
-$verifyLine = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
+$verifyLine = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
 	"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$TargetDatabase';"
 )
 Write-Output "Target DB defaults now:"; Write-Output $verifyLine
 
 if (-not $SkipDump) {
 	Write-Output "[4/6] Dumping source DB to $dumpFile ..."
-	Invoke-MySqlDump -Host $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -Database $SourceDatabase -SslMode $SourceSslMode -OutFile $dumpFile
+	Invoke-MySqlDump -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -Database $SourceDatabase -SslMode $SourceSslMode -OutFile $dumpFile
 }
 else {
 	Write-Output "[4/6] Skipping dump as requested."
@@ -313,14 +313,14 @@ if (-not $SkipRestore) {
 	if (-not (Test-Path $dumpFile)) {
 		throw "Dump file not found: $dumpFile"
 	}
-	Invoke-MySqlRestore -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -InFile $dumpFile
+	Invoke-MySqlRestore -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -InFile $dumpFile
 }
 else {
 	Write-Output "[5/6] Skipping restore as requested."
 }
 
 Write-Output "[6/6] Post-restore verification..."
-$postLine = Invoke-MySqlQuery -Host $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
+$postLine = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query (
 	"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$TargetDatabase';"
 )
 Write-Output "Target DB default charset/collation:"; Write-Output $postLine
