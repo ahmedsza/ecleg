@@ -95,7 +95,7 @@ function ConvertTo-PlainText {
 
 function Invoke-MySqlQuery {
 	param(
-		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
+		[Parameter(Mandatory)][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
@@ -133,7 +133,7 @@ function Invoke-MySqlQuery {
 
 function Invoke-MySqlDump {
 	param(
-		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
+		[Parameter(Mandatory)][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
