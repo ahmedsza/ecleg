@@ -326,8 +326,8 @@ Write-Output "  - Target settings retrieved."
 Write-Output "Source settings:"; Write-Output $sourceSettings
 Write-Output "Target settings:"; Write-Output $targetSettings
 
-$sourceMap = Convert-SettingsOutputToMap -Text $sourceSettings
-$targetMap = Convert-SettingsOutputToMap -Text $targetSettings
+$sourceMap = Convert-SettingsOutputToMap -Text ($sourceSettings | Out-String)
+$targetMap = Convert-SettingsOutputToMap -Text ($targetSettings | Out-String)
 Write-Output "Settings comparison (key items):"
 Write-SettingsComparison -Source $sourceMap -Target $targetMap
 
