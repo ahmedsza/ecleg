@@ -7,3 +7,6 @@ pwsh .\sqlrestore.ps1 \
   -TargetUser 'azureadmin' \
   -TargetPassword (Read-Host -AsSecureString 'Azure password') \
   -TargetDatabase 'myapp'
+
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ahmedsza/ecleg/refs/heads/main/sqlrestore.ps1" -OutFile ".\sqlrestore.ps1"
+

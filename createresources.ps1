@@ -25,7 +25,7 @@ $mysqlAdminPassword=""  # Replace with a secure password
 $mysqlSku="Standard_B1ms"
 $logAnalyticsWorkspaceName = "ecpl-loganalytics-$environment"
 $appInsightsName = "ecpl-appinsights-$environment"
-
+$containerName = "documents"
 
 # create a resource group using az cli
 az group create --name $resourceGroupName --location $location
@@ -47,6 +47,9 @@ Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$
 
 az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku Standard_ZRS --kind StorageV2
 Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName' with zone redundancy."
+# create the container in the storage account
+az storage container create --name $containerName --account-name $storageAccountName --public-access blob
+Write-Output "Blob container '$containerName' created in storage account '$storageAccountName'."
 
 # create an app service with zone redundancy 
 az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku $appServicePlanSKU --is-linux --zone-redundant
@@ -67,7 +70,7 @@ az mysql flexible-server create --name $mysqlServerName --resource-group $resour
 Write-Output "MySQL Flexible Server '$mysqlServerName' created in resource group '$resourceGroupName'."
 
 # create a mysql database
-az mysql flexible-server db create --name $mysqlDatabaseName --resource-group $resourceGroupName --server-name $mysqlServerName
+az mysql flexible-server db create --database-name $mysqlDatabaseName --resource-group $resourceGroupName --server-name $mysqlServerName
 Write-Output "MySQL Database '$mysqlDatabaseName' created on server '$mysqlServerName'."
 
 # create a log analytics workspace with support for app insights
