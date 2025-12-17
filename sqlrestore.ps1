@@ -285,7 +285,7 @@ New-Item -ItemType Directory -Path $WorkingDirectory -Force | Out-Null
 $dumpFile = Join-Path $WorkingDirectory ("{0}-{1:yyyyMMdd-HHmmss}.sql" -f $SourceDatabase, (Get-Date))
 
 Write-Output "[1/6] Reading source DB charset/collation from AWS..."
-$sourceSchemaLine = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query (
+$sourceSchemaLine = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode 'PREFERRED' -Query (
 	"SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$SourceDatabase';"
 )
 if (-not $sourceSchemaLine) {
@@ -304,7 +304,7 @@ Write-Output "Source DB default charset='$sourceCharset', collation='$sourceColl
 
 Write-Output "[2/6] Reading key MySQL settings (source + target)..."
 $settingsQuery = "SELECT 'character_set_server', @@character_set_server UNION ALL SELECT 'collation_server', @@collation_server UNION ALL SELECT 'sql_mode', @@sql_mode UNION ALL SELECT 'time_zone', @@time_zone;"
-$sourceSettings = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode $SourceSslMode -Query $settingsQuery
+$sourceSettings = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode 'PREFERRED' -Query $settingsQuery
 $targetSettings = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $settingsQuery
 
 Write-Output "Source settings:"; Write-Output $sourceSettings
@@ -345,7 +345,7 @@ Write-Output "Target DB defaults now:"; Write-Output $verifyLine
 
 if (-not $SkipDump) {
 	Write-Output "[4/6] Dumping source DB to $dumpFile ..."
-	Invoke-MySqlDump -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -Database $SourceDatabase -SslMode $SourceSslMode -OutFile $dumpFile
+	Invoke-MySqlDump -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -Database $SourceDatabase -SslMode 'PREFERRED' -OutFile $dumpFile
 }
 else {
 	Write-Output "[4/6] Skipping dump as requested."
