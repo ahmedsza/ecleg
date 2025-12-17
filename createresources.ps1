@@ -17,11 +17,11 @@ Write-Output "Resource group '$resourceGroupName' created in location '$location
 
 # create a standard static web app using az cli
 $frontEndStaticWebAppName = "ecpl-frontend-$environment"
-az staticwebapp create --name $frontEndStaticWebAppName --resource-group $resourceGroupName --location $location --source $frontEndRepositoryUrl --sku $staticwebSiteSku --source $frontEndRepositoryUrl --login-with-ado
+az staticwebapp create --name $frontEndStaticWebAppName --resource-group $resourceGroupName --location $location --source $frontEndRepositoryUrl --sku $staticwebSiteSku --source $frontEndRepositoryUrl --login-with-ado --branch main
 Write-Output "Static web app '$frontEndStaticWebAppName' created in resource group '$resourceGroupName'."
 
 # create a second static web app using az cli
 $cmsStaticWebAppName = "ecpl-cms-$environment"
-az staticwebapp create --name $cmsStaticWebAppName --resource-group $resourceGroupName  --location $location --source $cmsRepositoryUrl --sku $staticwebSiteSku --source $cmsRepositoryUrl --login-with-ado
+az staticwebapp create --name $cmsStaticWebAppName --resource-group $resourceGroupName  --location $location --source $cmsRepositoryUrl --sku $staticwebSiteSku --source $cmsRepositoryUrl --login-with-ado --branch main
 Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$resourceGroupName'."
 
