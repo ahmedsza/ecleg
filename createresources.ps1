@@ -17,7 +17,7 @@ $appServiceName = "ecpl-appservice-$environment"
 $keyVaultName = "ecpl-keyvault-$environment"
 $mysqlServerName = "ecplmysqlserver$environment"
 $mysqlDatabaseName = "ecplmysqldb$environment"
-$storageSku = "ZRS"  # Zone Redundant Storage
+$storageSku = "PremiumV2_ZRS"  # Zone Redundant Storage
 
 
 # create a resource group using az cli
@@ -40,7 +40,9 @@ Write-Output "Static web app '$cmsStaticWebAppName' created in resource group '$
 az storage account create --name $storageAccountName --resource-group $resourceGroupName --location $location --sku $storageSku --kind StorageV2
 Write-Output "Storage account '$storageAccountName' created in resource group '$resourceGroupName'."
 
-# create an app service with zone redundant storage
+# create an app service with zone redundancy 
+az appservice plan create --name $appServicePlanName --resource-group $resourceGroupName --location $location --sku P1v2 --is-linux
+Write-Output "App Service Plan '$appServicePlanName' created in resource group '$resource
 
 
 
