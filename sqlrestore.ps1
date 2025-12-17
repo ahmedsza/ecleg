@@ -89,27 +89,38 @@ function Get-MySqlSslArgs {
 
 	# For PREFERRED we intentionally do not pass any SSL flags and let the client/server negotiate.
 	if ($SslMode -eq 'PREFERRED') {
+		Write-Verbose "SSL mode PREFERRED: no SSL flags will be passed"
 		return @()
 	}
 
 	# Simplified: just check --help output every time (cheap operation)
 	# Avoids all script-scoped variable caching issues in Cloud Shell
+	Write-Verbose "Checking if $Tool supports --ssl-mode..."
 	$supportsMode = $false
 	try {
 		$help = & $Tool '--help' 2>&1 | Out-String
 		$supportsMode = ($help -match '(?m)^\s*--ssl-mode')
+		Write-Verbose "$Tool supports --ssl-mode: $supportsMode"
 	}
 	catch {
+		Write-Verbose "$Tool --help check failed: $_"
 		$supportsMode = $false
 	}
 
 	if ($supportsMode) {
+		Write-Verbose "Returning: --ssl-mode=$SslMode"
 		return @("--ssl-mode=$SslMode")
 	}
 
 	switch ($SslMode) {
-		'DISABLED' { return @('--skip-ssl') }
-		default { return @('--ssl') }
+		'DISABLED' { 
+			Write-Verbose "Returning legacy: --skip-ssl"
+			return @('--skip-ssl') 
+		}
+		default { 
+			Write-Verbose "Returning legacy: --ssl"
+			return @('--ssl') 
+		}
 	}
 }
 
@@ -140,7 +151,10 @@ function Invoke-MySqlQuery {
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
+		Write-Verbose "Getting SSL args for mysql (mode: $SslMode)"
 		$sslArgs = Get-MySqlSslArgs -Tool 'mysql' -SslMode $SslMode
+		Write-Verbose "SSL args: $($sslArgs -join ' ')"
+		
 		$args = @(
 			'--host', $MySqlHost,
 			'--port', $Port,
@@ -154,6 +168,7 @@ function Invoke-MySqlQuery {
 			$args += @('--database', $Database)
 		}
 
+		Write-Verbose "Executing: mysql $($args -join ' ')"
 		$out = & mysql @args 2>&1
 		if ($LASTEXITCODE -ne 0) {
 			throw "mysql query failed (exit $LASTEXITCODE) against ${MySqlHost}:$Port. Output:`n$out"
@@ -299,8 +314,14 @@ Write-Output "Source DB default charset='$sourceCharset', collation='$sourceColl
 
 Write-Output "[2/6] Reading key MySQL settings (source + target)..."
 $settingsQuery = "SELECT 'character_set_server', @@character_set_server UNION ALL SELECT 'collation_server', @@collation_server UNION ALL SELECT 'sql_mode', @@sql_mode UNION ALL SELECT 'time_zone', @@time_zone;"
+
+Write-Output "  - Querying source MySQL settings..."
 $sourceSettings = Invoke-MySqlQuery -MySqlHost $SourceHost -Port $SourcePort -User $SourceUser -Password $SourcePassword -SslMode 'PREFERRED' -Query $settingsQuery
+Write-Output "  - Source settings retrieved."
+
+Write-Output "  - Querying target MySQL settings..."
 $targetSettings = Invoke-MySqlQuery -MySqlHost $TargetHost -Port $TargetPort -User $TargetUser -Password $TargetPassword -SslMode $TargetSslMode -Query $settingsQuery
+Write-Output "  - Target settings retrieved."
 
 Write-Output "Source settings:"; Write-Output $sourceSettings
 Write-Output "Target settings:"; Write-Output $targetSettings
