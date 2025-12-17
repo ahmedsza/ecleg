@@ -39,7 +39,7 @@ param(
 
 	[Parameter()]
 	[ValidateSet('DISABLED', 'PREFERRED', 'REQUIRED', 'VERIFY_CA', 'VERIFY_IDENTITY')]
-	[string] $SourceSslMode = 'REQUIRED',
+	[string] $SourceSslMode = 'PREFERRED',
 
 	# Target (Azure MySQL Flexible Server)
 	[Parameter(Mandatory)]
@@ -87,6 +87,11 @@ function Get-MySqlSslArgs {
 		[Parameter(Mandatory)][ValidateSet('DISABLED', 'PREFERRED', 'REQUIRED', 'VERIFY_CA', 'VERIFY_IDENTITY')][string] $SslMode
 	)
 
+	# For PREFERRED we intentionally do not pass any SSL flags and let the client/server negotiate.
+	if ($SslMode -eq 'PREFERRED') {
+		return @()
+	}
+
 	# Some mysql/mysqldump clients (notably the one in Azure Cloud Shell) do not support --ssl-mode.
 	# When unsupported, passing --ssl-mode=REQUIRED is interpreted as a server variable assignment and fails with:
 	#   /usr/bin/mysql: unknown variable 'ssl-mode=REQUIRED'
@@ -109,7 +114,6 @@ function Get-MySqlSslArgs {
 
 	switch ($SslMode) {
 		'DISABLED' { return @('--skip-ssl') }
-		'PREFERRED' { return @() }
 		default { return @('--ssl') }
 	}
 }
