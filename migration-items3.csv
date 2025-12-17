@@ -1,0 +1,149 @@
+Work Item Type,Title,Tags
+User Story,Create Azure DevOps organization and project structure,operational
+User Story,Migrate SPA 1 source repo to Azure Repos preserving history (mirror push),operational
+User Story,Migrate SPA 2 source repo to Azure Repos preserving history (mirror push),operational
+User Story,Migrate Express API source repo to Azure Repos preserving history (mirror push),operational
+User Story,Create/migrate an infra-as-code repo for Azure resources and environments,operational;security;cost
+User Story,Implement branch policies (reviewers/build validation/required checks),security;operational
+User Story,Implement az cli for SPA1,operational
+User Story,Implement az cli for SPA2,operational
+User Story,Implement az cli for express api,operational
+User Story,Implement az cli for mysql db,operational
+User Story,Implement az cli for monitoring,operational
+User Story,Implement az cli for storage,operational
+User Story,Implement az cli for frontdoor,operational
+User Story,Create Azure DevOps pipeline for SPA 1 build (install/test/build artifacts),operational
+User Story,Deploy SPA 1 to chosen Azure host (Static Web Apps or App Service),operational;performance
+User Story,Create Azure DevOps pipeline for SPA 2 build (install/test/build artifacts),operational
+User Story,Deploy SPA 2 to chosen Azure host (Static Web Apps or App Service),operational;performance
+User Story,Create Azure DevOps pipeline for Express API build (lint/test/package or container build),operational
+User Story,Deploy Express API to chosen Azure host with environment variables and health checks,operational;performance;resilience
+User Story,Execute MySQL migration (dump/restore or DMS/replication cutover) and validate,resilience;operational
+User Story,Update API to use Azure MySQL endpoint + credentials,operational
+User Story,Create storage account(s) and blob containers for documents,security;cost;resilience
+User Story,Define blob naming/path conventions and metadata mapping from S3 keys,operational
+User Story,Copy documents from S3 to Blob and validate object count/checksums,operational;resilience
+User Story,Document current AWS architecture and dependencies (SPAs/API/MySQL/S3/DNS/certs),operational
+User Story,Capture the 4 custom domains and their current DNS records + certificate source,security;operational
+User Story,Identify all S3 API usage patterns (uploads/downloads/presigned URLs/metadata/lifecycle),operational;security
+User Story,Confirm RDS MySQL version/size/HA/backups/maintenance and migration constraints,operational;resilience;performance;cost
+User Story,Define subscriptions/resource groups per environment and ownership model,operational;security;cost
+User Story,Define naming conventions and mandatory tags for resources,operational;cost
+User Story,Define least-privilege RBAC roles for devops/app/support,security;operational
+User Story,Decide public endpoints vs VNet/private endpoints for MySQL/Storage,security;performance;resilience
+User Story,Move secrets to Key Vault and integrate with ADO variable groups,security;operational
+User Story,Create Azure Database for MySQL Flexible Server with sizing/HA/backups,performance;resilience;cost
+User Story,Configure firewall/private endpoint/TLS requirements for Azure MySQL,security;resilience
+User Story,Replace AWS S3 SDK usage in Express API with Azure Blob SDK equivalents,operational;performance
+User Story,Implement SAS token issuance pattern equivalent to S3 presigned URLs,security
+User Story,Configure and test Express API,operational
+User Story,Configure and test SPA1,operational
+User Story,Configure and test SPA2,operational
+User Story,Review how documents are referenced in db,operational
+User Story,Update document reference in db if required,operational
+User Story,Configure custom domain + HTTPS for SPA 1 in Azure and update DNS,security;operational
+User Story,Configure custom domain + HTTPS for SPA 2 in Azure and update DNS,security;operational
+User Story,Configure custom domain + HTTPS for API in Azure and update DNS,security;operational
+User Story,Expose Blob documents via custom domain (often via Front Door) and update DNS,security;performance;operational
+User Story,Use managed identity for API to access Blob,security
+User Story,Use managed identity for API to access mysql,security
+User Story,Use managed identity other services review,security
+User Story,Store secrets/certs as needed and reference from apps/pipelines,security;operational
+User Story,Disable public access if possible; use RBAC and scoped SAS,security
+User Story,Add rate limiting/headers/HTTPS-only and consider API gateway/WAF where required,security;resilience;performance
+User Story,Test restore process for Azure MySQL and document RPO/RTO,resilience;operational
+User Story,Choose LRS/ZRS/GRS for storage and validate meets RPO/RTO,resilience;cost
+User Story,Enable Application Insights and structured logging for the API,operational
+User Story,Enable diagnostic settings to Log Analytics for App Service/Storage/MySQL,operational
+User Story,Set alerts for availability/latency/errors and define SLO targets,operational;resilience
+User Story,Create budgets/alerts and enforce tagging for cost allocation,cost;operational
+User Story,Implement monitoring for SPA1,operational
+User Story,Implement monitoring for SPA2,operational
+User Story,Setup FrontDoor,security
+User Story,Implement FrontDoor for SPA1,security
+User Story,Implement FrontDoor for SPA2,security
+User Story,Implement FrontDoor for Express API,security
+User Story,Implement API Management to expose APIs,security;operational
+User Story,Implement  bicep for SPA1,operational
+User Story,Implement  bicep for SPA2,operational
+User Story,Implement  bicep for express api,operational
+User Story,Implement  bicep for mysql db,operational
+User Story,Implement  bicep for monitoring,operational
+User Story,Implement  bicep for storage,operational
+User Story,Implement  bicep for frontdoor,operational
+User Story,Implement Entra ID for priviledged operations ,security
+User Story,Define DNS cutover plan with TTL reduction monitoring window and rollback criteria,operational;resilience
+User Story,Document target RTO and RPO per component and validate architecture meets targets,resilience;operational
+User Story,Define certificate strategy for custom domains (managed cert vs Key Vault) and renewal monitoring,security;operational;resilience
+User Story,Configure Front Door WAF policy (managed rules custom rules exclusions) and attach to endpoints,security;resilience
+User Story,Enable Front Door diagnostic logs and WAF logs to Log Analytics and create actionable alerts,operational;security
+User Story,Enforce HTTPS-only and redirect HTTP to HTTPS at edge (Front Door) and origin as needed,security;operational
+User Story,Configure deployment slots and slot swap strategy for Express API host where applicable,operational;resilience
+User Story,Configure health check endpoint and autoscale rules for Express API hosting plan,performance;resilience;operational
+User Story,Create alert action groups and attach runbook links for critical alerts,operational;resilience
+User Story,Enable Microsoft Defender for Cloud plans for App Service Storage and MySQL where applicable,security;operational
+User Story,Configure Storage blob soft delete versioning and lifecycle management policies,operational;resilience;cost
+User Story,Implement private DNS zones and name resolution for private endpoints (Storage MySQL),security;operational;resilience
+User Story,Assign Azure Policy to enforce tagging and baseline diagnostic settings across subscriptions,security;cost;operational
+User Story,Implement retry backoff and circuit breaker patterns in Express API for MySQL and Blob dependencies,resilience;performance
+User Story,Run baseline load test for API and validate scaling thresholds and performance SLOs,performance;operational
+User Story,Document the common operational tasks (scaling backups restores monitoring),operational;resilience
+User Story,Define runbook for incident response based on alerts and SLO breaches,operational;resilience
+User Story,Perform reliability design review to simplify architecture and reduce operational complexity,operational;resilience
+User Story,Identify and rate critical user flows and system flows and prioritize by business criticality,operational;resilience
+User Story,Perform failure mode analysis for critical flows and dependencies and define mitigations,resilience;operational
+User Story,Define end-to-end health model with SLIs and implement health signals per component and key flows,operational;resilience
+User Story,Design redundancy strategy for compute network and data to meet reliability targets and critical flows,resilience;operational
+User Story,Implement self-healing and self-preservation behaviors including graceful degradation and backpressure,resilience;performance
+User Story,Run chaos testing or fault-injection scenarios for dependency outages and scaling and validate recovery,resilience;operational
+User Story,Create and validate disaster recovery plan covering all components and perform scheduled DR drills,resilience;operational
+User Story,Build reliability dashboards for uptime success rate latency and error budget for key flows,operational;resilience
+User Story,Define workload security baseline aligned to compliance requirements and Azure platform recommendations,security;operational
+User Story,Automate security posture measurement against the baseline (policy compliance reports and periodic reviews),security;operational
+User Story,Threat model the workload and key flows and track mitigations in the backlog,security;operational
+User Story,Implement secure SDLC controls in Azure DevOps (SAST dependency scanning secret scanning and build provenance),security;operational
+User Story,Classify workload data and define sensitivity labels and handling requirements for DB blobs and logs,security;operational
+User Story,Define segmentation and perimeter strategy across network identities roles and resource organization,security;operational;resilience
+User Story,Enforce conditional access MFA and privileged identity management (PIM) for admin roles and break-glass accounts,security;operational
+User Story,Disable or tightly restrict non-identity access paths (Storage shared key legacy auth) and audit exceptions,security;operational
+User Story,Control egress traffic from application components (outbound restrictions firewall rules and DNS) and document allowed destinations,security;operational;resilience
+User Story,Ensure encryption in transit and at rest for MySQL and Storage including CMK decision and key management approach,security;resilience
+User Story,Enable Key Vault protections (RBAC least privilege purge protection soft delete diagnostics) and implement secret rotation with emergency rotation process,security;operational;resilience
+User Story,Integrate threat detection signals (Defender alerts WAF/APIM logs) into SecOps workflow and alert routing,security;operational
+User Story,Establish security testing regimen (DAST penetration test readiness config review) and validate detections,security;operational
+User Story,Define and exercise security incident response playbooks (credential leak data exfiltration WAF events) with clear owners,security;operational;resilience
+User Story,Establish FinOps culture and ownership (training cost accountability and regular cost reviews),cost;operational
+User Story,Create and maintain workload cost model (initial run rate ongoing buffer) per environment,cost;operational
+User Story,Collect daily cost data and review trends forecasts and anomalies with automated alerts,cost;operational
+User Story,Implement spending guardrails (policy limits approval gates and resource constraints) for non-prod and prod,cost;security;operational
+User Story,Evaluate commitment-based savings options (reserved capacity savings plans license optimization) for major services,cost;operational
+User Story,Validate billing meters and align resource usage to billing increments for major cost drivers (PoC if needed),cost;operational
+User Story,Right-size and remove underutilized resources regularly (compute plans MySQL sizing Front Door tiers),cost;operational;performance
+User Story,Optimize non-production environment costs (operating hours scaling emulation tradeoffs) with automation,cost;operational
+User Story,Align flow costs to flow priority and explicitly document cost tradeoffs for low-priority flows,cost;operational
+User Story,Optimize data costs across Blob and MySQL (retention tiering replication backup policies and storage formats),cost;operational;resilience
+User Story,Optimize code costs (profiling hot paths caching payload shaping) to reduce infrastructure requirements,cost;performance
+User Story,Optimize scaling costs by tuning scale units and autoscale configurations and demand controls,cost;performance;operational
+User Story,Optimize engineering time cost (reduce pipeline duration improve debugging fidelity use prod mocking),cost;operational
+User Story,Consolidate shared resources where appropriate (centralized logging monitoring networking) and define ownership,cost;operational
+User Story,Define engineering and operations standards (blameless postmortems continuous improvement and regular ops reviews),operational
+User Story,Formalize routine and emergency operational procedures with owners on-call escalation and communication templates,operational;resilience
+User Story,Standardize planning and design documentation process (requirements docs ADRs architecture diagrams) and keep it current,operational
+User Story,Standardize development practices (coding standards linting testing strategy branching versioning) across repos,operational
+User Story,Standardize IaC modules and quality gates (lint validate plan review) for consistent environment provisioning,operational
+User Story,Implement environment promotion strategy with approvals and quality gates (dev test staging prod) in pipelines,operational
+User Story,Define incident management process (severity levels roles timelines) and run regular incident drills,operational;resilience
+User Story,Automate repetitive operational tasks (user onboarding secret rotation log retention resource cleanup) using platform-native tools,operational
+User Story,Automate workload bootstrapping and governance (subscription setup policy assignments monitoring baselines) from day one,operational;security
+User Story,Define safe deployment practices (small releases progressive exposure feature flags rollback) including emergency deployment path,operational;resilience
+User Story,Define numerical performance targets (latency throughput concurrency) for all key workload flows,performance;operational
+User Story,Perform capacity planning for expected usage changes (seasonality campaigns peak events) and document scale assumptions,performance;operational
+User Story,Validate service and tier selections (compute MySQL Front Door APIM) against performance targets and capacity plan,performance;cost;operational
+User Story,Collect and dashboard end-to-end performance data across app platform and data layers (distributed tracing dependency latency),performance;operational
+User Story,Define scale unit boundaries and optimize scaling and partitioning strategy (autoscale limits data partitioning),performance;resilience;operational
+User Story,Establish performance benchmark and run regular performance tests in production-like environment against targets,performance;operational
+User Story,Optimize data usage in MySQL (indexes query plans connection pooling) based on observed workload patterns,performance;operational
+User Story,Prioritize performance optimization for critical flows and allocate resources accordingly,performance;operational
+User Story,Review and tune operational tasks that impact performance (backups reindexing deployments scans) to meet targets,performance;operational
+User Story,Define and test live performance incident process and runbooks (triage mitigation scaling throttling) with clear ownership,performance;operational;resilience
+User Story,Run continuous performance optimization cadence based on telemetry (regression detection and preventive improvements),performance;operational
