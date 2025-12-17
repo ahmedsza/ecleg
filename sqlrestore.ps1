@@ -15,8 +15,8 @@ Prereqs on the machine running this script:
   (e.g., MySQL Installer, MariaDB client, or MySQL Shell bundle)
 
 Security note:
-- This script accepts passwords as SecureString and uses the MYSQL_PWD env var
-  for the subprocess invocation to avoid putting passwords on the command line.
+- This script accepts passwords as plain strings and uses the MYSQL_PWD env var
+	for the subprocess invocation to avoid putting passwords on the command line.
 #>
 
 [CmdletBinding()]
@@ -32,7 +32,7 @@ param(
 	[string] $SourceUser,
 
 	[Parameter(Mandatory)]
-	[object] $SourcePassword,
+	[string] $SourcePassword,
 
 	[Parameter(Mandatory)]
 	[string] $SourceDatabase,
@@ -52,7 +52,7 @@ param(
 	[string] $TargetUser,
 
 	[Parameter(Mandatory)]
-	[object] $TargetPassword,
+	[string] $TargetPassword,
 
 	[Parameter(Mandatory)]
 	[string] $TargetDatabase,
@@ -89,20 +89,8 @@ function Test-CommandExists {
 }
 
 function ConvertTo-PlainText {
-	param([Parameter(Mandatory)] $Secure)
-	if ($Secure -is [string]) {
-		return $Secure
-	}
-	if ($Secure -is [securestring]) {
-		$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Secure)
-		try {
-			return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
-		}
-		finally {
-			[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
-		}
-	}
-	throw "Password must be a SecureString or plain string. Got: $($Secure.GetType().FullName)"
+	param([Parameter(Mandatory)][string] $Password)
+	return $Password
 }
 
 function Invoke-MySqlQuery {
@@ -110,13 +98,13 @@ function Invoke-MySqlQuery {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)] $Password,
+		[Parameter(Mandatory)][string] $Password,
 		[Parameter(Mandatory)][string] $Query,
 		[Parameter()][string] $Database,
 		[Parameter(Mandatory)][string] $SslMode
 	)
 
-	$plain = ConvertTo-PlainText -Secure $Password
+	$plain = ConvertTo-PlainText -Password $Password
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
@@ -148,13 +136,13 @@ function Invoke-MySqlDump {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)] $Password,
+		[Parameter(Mandatory)][string] $Password,
 		[Parameter(Mandatory)][string] $Database,
 		[Parameter(Mandatory)][string] $SslMode,
 		[Parameter(Mandatory)][string] $OutFile
 	)
 
-	$plain = ConvertTo-PlainText -Secure $Password
+	$plain = ConvertTo-PlainText -Password $Password
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
@@ -190,12 +178,12 @@ function Invoke-MySqlRestore {
 		[Parameter(Mandatory)][string] $Host,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
-		[Parameter(Mandatory)] $Password,
+		[Parameter(Mandatory)][string] $Password,
 		[Parameter(Mandatory)][string] $SslMode,
 		[Parameter(Mandatory)][string] $InFile
 	)
 
-	$plain = ConvertTo-PlainText -Secure $Password
+	$plain = ConvertTo-PlainText -Password $Password
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {

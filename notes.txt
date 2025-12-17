@@ -1,12 +1,14 @@
-pwsh .\sqlrestore.ps1 \
-  -SourceHost 'mydb.abc123xyz.eu-west-1.rds.amazonaws.com' \
-  -SourceUser 'awsadmin' \
-  -SourcePassword (Read-Host -AsSecureString 'AWS password') \
-  -SourceDatabase 'myapp' \
-  -TargetHost 'myserver.mysql.database.azure.com' \
-  -TargetUser 'azureadmin' \
-  -TargetPassword (Read-Host -AsSecureString 'Azure password') \
+pwsh -NoProfile -File .\sqlrestore.ps1 `
+  -SourceHost 'mydb.abc123xyz.eu-west-1.rds.amazonaws.com' `
+  -SourceUser 'awsadmin' `
+  -SourcePassword 'password1' `
+  -SourceDatabase 'myapp' `
+  -TargetHost 'myserver.mysql.database.azure.com' `
+  -TargetUser 'azureadmin' `
+  -TargetPassword 'password2' `
   -TargetDatabase 'myapp'
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ahmedsza/ecleg/refs/heads/main/sqlrestore.ps1" -OutFile ".\sqlrestore.ps1"
+# NOTE: This downloads the script from GitHub and overwrites your local copy.
+# If you've made local edits, download to a different filename instead:
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ahmedsza/ecleg/refs/heads/main/sqlrestore.ps1" -OutFile ".\sqlrestore.remote.ps1"
 
