@@ -175,7 +175,7 @@ function Invoke-MySqlDump {
 
 function Invoke-MySqlRestore {
 	param(
-		[Parameter(Mandatory)][Alias('Host')][string] $MySqlHost,
+		[Parameter(Mandatory)][string] $MySqlHost,
 		[Parameter(Mandatory)][int] $Port,
 		[Parameter(Mandatory)][string] $User,
 		[Parameter(Mandatory)][string] $Password,
