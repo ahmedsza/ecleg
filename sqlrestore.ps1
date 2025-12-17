@@ -81,6 +81,39 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Get-MySqlSslArgs {
+	param(
+		[Parameter(Mandatory)][ValidateSet('mysql', 'mysqldump')][string] $Tool,
+		[Parameter(Mandatory)][ValidateSet('DISABLED', 'PREFERRED', 'REQUIRED', 'VERIFY_CA', 'VERIFY_IDENTITY')][string] $SslMode
+	)
+
+	# Some mysql/mysqldump clients (notably the one in Azure Cloud Shell) do not support --ssl-mode.
+	# When unsupported, passing --ssl-mode=REQUIRED is interpreted as a server variable assignment and fails with:
+	#   /usr/bin/mysql: unknown variable 'ssl-mode=REQUIRED'
+	if (-not $script:__sslModeSupportCache) {
+		$script:__sslModeSupportCache = @{}
+	}
+	if (-not $script:__sslModeSupportCache.ContainsKey($Tool)) {
+		try {
+			$help = & $Tool '--help' 2>&1 | Out-String
+			$script:__sslModeSupportCache[$Tool] = ($help -match '(?m)^\s*--ssl-mode')
+		}
+		catch {
+			$script:__sslModeSupportCache[$Tool] = $false
+		}
+	}
+
+	if ($script:__sslModeSupportCache[$Tool]) {
+		return @("--ssl-mode=$SslMode")
+	}
+
+	switch ($SslMode) {
+		'DISABLED' { return @('--skip-ssl') }
+		'PREFERRED' { return @() }
+		default { return @('--ssl') }
+	}
+}
+
 function Test-CommandExists {
 	param([Parameter(Mandatory)][string] $Name)
 	if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
@@ -108,14 +141,16 @@ function Invoke-MySqlQuery {
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
+		$sslArgs = Get-MySqlSslArgs -Tool 'mysql' -SslMode $SslMode
 		$args = @(
 			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
-			"--ssl-mode=$SslMode",
+			$sslArgs,
 			'--batch', '--skip-column-names',
 			'--execute', $Query
 		)
+		$args = @($args | Where-Object { $_ -ne $null -and $_ -ne '' } | ForEach-Object { $_ })
 		if ($Database) {
 			$args += @('--database', $Database)
 		}
@@ -146,11 +181,12 @@ function Invoke-MySqlDump {
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
+		$sslArgs = Get-MySqlSslArgs -Tool 'mysqldump' -SslMode $SslMode
 		$args = @(
 			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
-			"--ssl-mode=$SslMode",
+			$sslArgs,
 			'--databases', $Database,
 			'--single-transaction',
 			'--routines', '--events', '--triggers',
@@ -158,6 +194,7 @@ function Invoke-MySqlDump {
 			'--set-gtid-purged=OFF',
 			'--column-statistics=0'
 		)
+		$args = @($args | Where-Object { $_ -ne $null -and $_ -ne '' } | ForEach-Object { $_ })
 
 		$errFile = "$OutFile.stderr.txt"
 		if (Test-Path $errFile) { Remove-Item -Force $errFile }
@@ -187,12 +224,14 @@ function Invoke-MySqlRestore {
 	$old = $env:MYSQL_PWD
 	$env:MYSQL_PWD = $plain
 	try {
+		$sslArgs = Get-MySqlSslArgs -Tool 'mysql' -SslMode $SslMode
 		$args = @(
 			'--host', $MySqlHost,
 			'--port', $Port,
 			'--user', $User,
-			"--ssl-mode=$SslMode"
+			$sslArgs
 		)
+		$args = @($args | Where-Object { $_ -ne $null -and $_ -ne '' } | ForEach-Object { $_ })
 
 		Get-Content -Path $InFile -Raw | & mysql @args 2>&1 | Out-Null
 		if ($LASTEXITCODE -ne 0) {
