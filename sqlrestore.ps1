@@ -92,26 +92,18 @@ function Get-MySqlSslArgs {
 		return @()
 	}
 
-	# Some mysql/mysqldump clients (notably the one in Azure Cloud Shell) do not support --ssl-mode.
-	# When unsupported, passing --ssl-mode=REQUIRED is interpreted as a server variable assignment and fails with:
-	#   /usr/bin/mysql: unknown variable 'ssl-mode=REQUIRED'
-	# Use a local variable instead of script scope to avoid Cloud Shell scoping issues
-	if (-not (Get-Variable -Name '__sslModeSupportCacheLocal' -Scope Script -ErrorAction SilentlyContinue)) {
-		Set-Variable -Name '__sslModeSupportCacheLocal' -Value @{} -Scope Script
+	# Simplified: just check --help output every time (cheap operation)
+	# Avoids all script-scoped variable caching issues in Cloud Shell
+	$supportsMode = $false
+	try {
+		$help = & $Tool '--help' 2>&1 | Out-String
+		$supportsMode = ($help -match '(?m)^\s*--ssl-mode')
 	}
-	$cache = Get-Variable -Name '__sslModeSupportCacheLocal' -Scope Script -ValueOnly
-	
-	if (-not $cache.ContainsKey($Tool)) {
-		try {
-			$help = & $Tool '--help' 2>&1 | Out-String
-			$cache[$Tool] = ($help -match '(?m)^\s*--ssl-mode')
-		}
-		catch {
-			$cache[$Tool] = $false
-		}
+	catch {
+		$supportsMode = $false
 	}
 
-	if ($cache[$Tool]) {
+	if ($supportsMode) {
 		return @("--ssl-mode=$SslMode")
 	}
 
